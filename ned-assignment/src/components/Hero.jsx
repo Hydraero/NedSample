@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useState } from "react"
+import { MdAddCircleOutline } from "react-icons/md"
 const Hero = () => {
     // eslint-disable-next-line no-unused-vars
     const [data, setData] = useState(null);
@@ -100,6 +101,7 @@ const Hero = () => {
     //Use Of Funds Items
     var useOfFundsLabel = dataStuff.get('use_of_funds')?.label;
     var useOfFundsValue = dataStuff.get('use_of_funds')?.value;
+    var useOfFundsArr = useOfFundsValue?.split("*");
 
     //Results Section Items:
     //Fees
@@ -107,6 +109,15 @@ const Hero = () => {
     var feePercentage = Number(desiredFeesValue*100);
     var feeAmount = Number(desiredFeesValue*funding_amount);
     var totalRevenueShare = Number(funding_amount)+feeAmount;
+    var expectedTransfers = 0;
+    if(radioInput == "weekly")
+    {
+        expectedTransfers = (totalRevenueShare)/(revenue_amount*revenuePercentValueNum*52);
+    }
+    else if(radioInput == "monthly")
+    {
+        expectedTransfers = (totalRevenueShare)/(revenue_amount*revenuePercentValueNum*12);
+    }
 
 
     return (
@@ -129,8 +140,8 @@ const Hero = () => {
 
                             <div className="loan-amount">
                                 <h2>{loanLabel}</h2>
-                                <h2>*slider here*{loanValueInt}</h2>
-                                <input type="number" className="bg-primary-grey w-4/6 h-10" onChange={handleFundingChange}></input>
+                                <input name="rangeAmount" type="range" className="bg-primary-grey w-4/6 h-10" min="0" max={`${loanValueInt}`} onChange={handleFundingChange}></input>
+                                <input name="amount" type="number" className="bg-primary-grey w-1/6 h-10" onChange={handleFundingChange}></input>
                             </div>
 
                             <div className="repayment-rate">
@@ -153,22 +164,37 @@ const Hero = () => {
                                             </div>
                                         ))}
                                     </span>
-                                    Selected: {radioInput}  
                                 </h2>
                             </div>
 
-                            <div className="repayment-delay flex flex-row">
-                                <h2>Desired {repaymentDelayLabel}: *dropdown    *</h2>
+                            <div className="repayment-delay flex flex-row space-x-5">
+                                <label htmlFor="repaymentDelay">Desired {repaymentDelayLabel}:</label>
+                                <select className="border repayment-delay-dropdown">
+                                    {repaymentDelayValueArr?.map((repaymentDelayItems) => (
+                                        <option key={repaymentDelayItems} value={repaymentDelayItems}>
+                                            {repaymentDelayItems}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
 
                             <div className="fund-uses">
-                                <h2>{useOfFundsLabel}</h2>
-                                <div className="flex flex-row">
-                                    <h2>*Use of funds drop down*{useOfFundsValue}</h2>
-                                    <h2>*description input*</h2>
-                                    <h2>*amount input*</h2>
-                                    <h2>*add button*</h2>
-                                </div>
+                                <h2 className="pb-5">{useOfFundsLabel}</h2>
+                                <form className="flex flex-row space-x-3">
+                                    <select className="border fund-uses-dropdown">
+                                        {useOfFundsArr?.map((useOfFundsArrItem) => (
+                                            <option key={useOfFundsArrItem} value={useOfFundsArrItem}>
+                                                {useOfFundsArrItem}
+                                            </option>
+                                        ))}
+                                    </select>
+
+                                    <input className="bg-primary-grey w-4/6 h-10 px-3 description-input" type="text" placeholder="Description"></input>
+
+                                    <input className="bg-primary-grey w-2/6 h-10 px-3 amount-input" type="text" placeholder="Amount"></input>
+                                    
+                                    <button type="button"><MdAddCircleOutline className="text-xl"/></button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -202,10 +228,11 @@ const Hero = () => {
                                 <span className="ml-auto">${totalRevenueShare}</span>
                             </div>
                             
-                            <div>
+                            <div className="flex flex-row">
                                 <h2>Expected transfers</h2>
+                                <span className="ml-auto">{expectedTransfers}</span>
                             </div>
-
+                            
                             <div>
                                 <h2>Expected completion date </h2>
                             </div>
