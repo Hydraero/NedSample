@@ -214,7 +214,6 @@ const Hero = () => {
                                     ))}
                                 </select>
                             </form>
-                            Date chosen: {repaymentDelay}
 
                             <div className="fund-uses">
                                 <h2 className="pb-5">{useOfFundsLabel}</h2>
