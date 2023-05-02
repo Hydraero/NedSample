@@ -177,8 +177,15 @@ const Hero = () => {
 
                             <div className="loan-amount">
                                 <h2>{loanLabel}</h2>
-                                <input name="rangeAmount" type="range" className="bg-primary-grey w-4/6 h-10" min={fundingMin} max={fundingMax} onChange={handleFundingChange}></input>
-                                <input name="amount" type="number" className="bg-primary-grey w-1/6 h-10" min={fundingMin} max={fundingMax} onChange={handleFundingChange}></input>
+                                <div className="flex flex-row space-x-72">
+                                    <h2>${fundingMin} </h2>
+                                    <h2 className="pl-2">${fundingMax} </h2>
+                                </div>
+                                <div className="flex flex-row">
+                                    <input name="rangeAmount" type="range" className="bg-primary-grey w-4/6 h-10" min={fundingMin} max={fundingMax} onChange={handleFundingChange}></input>
+                                    <input name="amount" type="number" className="bg-primary-grey w-1/6 h-6" min={fundingMin} max={fundingMax} onChange={handleFundingChange}></input>
+                                </div>
+
                             </div>
 
                             <div className="repayment-rate">
@@ -266,7 +273,7 @@ const Hero = () => {
                                 <span className="ml-auto">({feePercentage}%) ${feeAmount}</span>
                             </div>
 
-                            <div></div>
+                            <div className="border-t-2 border-gray-200 inline-block"></div>
 
                             <div className="flex flex-row">
                                 <h2>Total Revenue Share</h2>
@@ -275,7 +282,7 @@ const Hero = () => {
 
                             <div className="flex flex-row">
                                 <h2>Expected transfers</h2>
-                                <span className="ml-auto">{expectedTransfers}</span>
+                                <span className="ml-auto">{Math.ceil(expectedTransfers)}</span>
                             </div>
 
                             <div className="flex flex-row">

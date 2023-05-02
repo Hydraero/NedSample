@@ -10,6 +10,9 @@ export default {
         'primary-grey' : '#F9F9F9',
         'button-blue' : '#0E7CF4',
       },
+      rotate: {
+        '270': '270deg',
+      }
     },
   },
   plugins: [],
