@@ -1,6 +1,8 @@
 import { useEffect } from "react";
 import { useState } from "react"
 import { MdAddCircleOutline } from "react-icons/md"
+import { BsFillTrash3Fill } from "react-icons/bs"
+
 const Hero = () => {
     // eslint-disable-next-line no-unused-vars
     const [data, setData] = useState(null);
@@ -8,8 +10,13 @@ const Hero = () => {
     const [funding_amount, set_funding_amount] = useState(0);
     const [radioInput, setRadioInput] = useState("weekly");                         //https://codesandbox.io/s/mlp6y?file=/src/App.js
     const [repaymentDelay, setRepaymentDelay] = useState("");
-    const [fundUses, setFundUses] = useState([{
-    }]);
+
+    //Fund uses states
+    const [fundUseCategory, setfundUseCategory] = useState("Marketing");
+    const [fundUseDescription, setFundUseDescription] = useState("");
+    const [fundUseAmount, setFundUseAmount] = useState(0);
+
+    const [fundUses, setFundUses] = useState([]);                                   //Array of objects
 
 
     function handleRevenueChange(e) {
@@ -28,18 +35,38 @@ const Hero = () => {
         setRepaymentDelay(e.target.value);
     }
 
+
+    //Fund use handlers
+    const fundUseCategoryChangeHandler = (e) => {
+        setfundUseCategory(e.target.value);
+    }
+
+    const handleFundUseDescriptionChange = (e) => {
+        setFundUseDescription(e.target.value);
+    }
+
+    function handleFundUseAmountChange(e) {
+        setFundUseAmount(e.target.value);
+    }
+
     function handleAddFundUse() {
         const updateFundUses = [
             ...fundUses,
             {
-                id: 1,
-                fundType: "Marketing",
-                description: "description",
-                amount: 0,
+                id: fundUses.length,
+                fundType: fundUseCategory,
+                description: fundUseDescription,
+                amount: fundUseAmount,
             }
         ]
         setFundUses(updateFundUses);
     }
+
+    const removeObjectWithId = (index) => {
+        const deleteFundUses = [...fundUses];
+        setFundUses(deleteFundUses.filter((_, i) => i !== index));
+    }
+
 
     useEffect(() => {
         /* const getData = async () => {
@@ -101,6 +128,7 @@ const Hero = () => {
     var revenuePercentValueNum = eval(revenuePercentValue);                     //Evaluate revenue share percentage equation
     var revenuePercentValuePercent = revenuePercentValueNum * 100;
 
+
     //if revenue percentage value is less than minimum or greater than maximum, set it to min or max
     if (revenuePercentValuePercent < revenuePercentMin) {
         revenuePercentValuePercent = revenuePercentMin;
@@ -129,6 +157,13 @@ const Hero = () => {
     var fundingMin = dataStuff.get('funding_amount_min')?.value;
     var fundingMax = dataStuff.get('funding_amount_max')?.value;
 
+    
+    if(loanValueInt < fundingMax)
+    {
+        fundingMax = Math.round(loanValueInt * 100) / 100;
+
+    }
+
     //Results Section Items:
     //Fees
     var desiredFeesValue = Number(dataStuff.get('desired_fee_percentage')?.value);
@@ -140,23 +175,39 @@ const Hero = () => {
     var feeAmount = Number(desiredFeesValue * funding_amount);
     var totalRevenueShare = Number(funding_amount) + feeAmount;
     var expectedTransfers = 0;
+    var expectedTransfersInDays = 0;
     if (radioInput == "weekly") {
         expectedTransfers = (totalRevenueShare * 52) / (revenue_amount * revenuePercentValueNum);
     }
     else if (radioInput == "monthly") {
         expectedTransfers = (totalRevenueShare * 12) / (revenue_amount * revenuePercentValueNum);
     }
+    expectedTransfersInDays = (totalRevenueShare * 365) / (revenue_amount * revenuePercentValueNum);
 
     const date = new Date();
     const monthNames = ["January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November", "December"
     ];
     var repaymentDelayDaysInt = Number(repaymentDelay.replace(/\D/g, ""));
-    var expectedCompletionDate = date.setDate(date.getDate() + expectedTransfers + repaymentDelayDaysInt);
-    var d = new Date(expectedCompletionDate);
+
+    var d = new Date();
+    /*
+    if (radioInput == "weekly") {
+        var expectedCompletionDateWeekly = date.setDate(date.getDate() + (expectedTransfers*7) + repaymentDelayDaysInt)
+        d = new Date(expectedCompletionDateWeekly);
+    }
+    else if (radioInput == "monthly") {
+        var expectedCompletionDateMonth = date.setDate(date.getDate() + (expectedTransfers*30) + repaymentDelayDaysInt)
+        d = new Date(expectedCompletionDateMonth);
+    }
+    */
+    var expectedCompletionDate = date.setDate(date.getDate() + expectedTransfersInDays + repaymentDelayDaysInt)
+    d = new Date(expectedCompletionDate);
+
     var formattedDate = `${monthNames[d.getMonth()]} ` + `${d.getDate()}` + "," + ` ${d.getFullYear()}`;
 
-
+    const expectedAPR = ((((desiredFeesValue*funding_amount))/funding_amount)/(expectedTransfersInDays))*365*100;
+    
     return (
         <div className="flex flex-col bg-primary-grey h-screen">
 
@@ -225,28 +276,33 @@ const Hero = () => {
                             <div className="fund-uses">
                                 <h2 className="pb-5">{useOfFundsLabel}</h2>
                                 <form className="flex flex-row space-x-3">
-                                    <select className="border fund-uses-dropdown">
+                                    <select className="border fund-uses-dropdown" value={fundUseCategory} onChange={fundUseCategoryChangeHandler}>
                                         {useOfFundsArr?.map((useOfFundsArrItem) => (
                                             <option key={useOfFundsArrItem} value={useOfFundsArrItem}>
                                                 {useOfFundsArrItem}
                                             </option>
                                         ))}
                                     </select>
-                                    <input className="bg-primary-grey w-4/6 h-10 px-3 description-input" type="text" placeholder="Description"></input>
+                                    <input className="bg-primary-grey w-4/6 h-10 px-3 description-input" type="text" placeholder="Description" onChange={handleFundUseDescriptionChange}></input>
 
-                                    <input className="bg-primary-grey w-2/6 h-10 px-3 amount-input" type="text" placeholder="Amount"></input>
+                                    <input className="bg-primary-grey w-2/6 h-10 px-3 amount-input" type="number" placeholder="Amount" onChange={handleFundUseAmountChange}></input>
 
                                     <button type="button" onClick={handleAddFundUse}><MdAddCircleOutline className="text-xl text-button-blue add-fund-button" /></button>
                                 </form>
-                                {/* 
+
                                 <ul>
                                     {fundUses?.map((fundUse) => (
-                                        <div className="flex flex-row space-x-24" key={fundUse.id}>
-                                            <p>{fundUse.fundType}</p>
+                                        <div className="flex flex-row space-x-24 relative" key={fundUse.id}>
+                                            <p className="left-0 grow">{fundUse.fundType}</p>
+                                            <p className="left-1/4 grow">{fundUse.description}</p>
+                                            <p className="left-1/2 grow">{fundUse.amount}</p>
+                                            <button className="left-3/4 grow text-red-600" type="button" onClick={() => removeObjectWithId(fundUse.id)}>
+                                                <BsFillTrash3Fill className="" />{fundUse.id}
+                                            </button>
                                         </div>
                                     ))}
                                 </ul>
-                                */}
+
                             </div>
                         </div>
                     </div>
@@ -289,6 +345,13 @@ const Hero = () => {
                                 <h2>Expected completion date </h2>
                                 <span className="ml-auto text-button-blue">{formattedDate}</span>
                             </div>
+
+                            <div className="flex flex-row">
+                                <h2>Expected APR</h2>
+                                <span className="ml-auto">{Math.round(expectedAPR * 100) / 100}%</span>
+                            </div>
+
+                            <div>{expectedTransfersInDays}</div>
                         </div>
                     </div>
                 </div>
